@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+      <title>BeeTalk</title>
+        
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-latest.js"></script>
+      
+      <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+      <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+      
+      <script src="/js/ismobile.js"></script>
+      
+  </head>
+  
+ <style type="text/css">
+ 
+        div[data-role ="page"] {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        } 
+         .ui-content{
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }   
+        
+        body.ui-mobile-viewport {	
+        	background: #333;
+            background-position: 0 0;  
+        }
+
+    /* Smartphones (portrait and landscape) ----------- */
+    	div[data-role=page]{
+    		background: white;
+    		max-width: 550px !important;
+    		margin: 0 auto !important;
+    		position: relative !important;
+    	}
+        div[data-role=navbar]{
+            background: white;
+            max-width: 550px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+        }        
+        
+        </style>      
+
+<style type="text/css">
+
+.bubbledLeft,.bubbledRight{
+  margin-top: 3px;
+  max-width: 80%;
+  clear: both;
+  float:left;
+}
+
+.bubbledLeft{
+  float: left;
+  margin-right: auto;
+  
+  //margin-left: 50px;
+  
+  border: 1px solid grey;
+  border-radius: 5px 5px 5px 0px; 
+  border-width: 7px 5px 5px 11px; 
+  border-image: url(/img/speech_bubble_left.png) 7 5 5 11 stretch stretch ;
+  -o-border-image: url(/img/speech_bubble_left.png) 7 5 5 11 stretch stretch ;
+  -moz-border-image: url(/img/speech_bubble_left.png) 7 5 5 11 stretch stretch ;
+  -webkit-border-image: url(/img/speech_bubble_left.png) 7 5 5 11 stretch stretch ;
+}
+
+.bubbledRight{
+  float: right;
+  margin-left: auto;
+  text-align: right;
+
+  //margin-right: 50px;
+  
+  border: 1px solid grey;
+  border-radius: 5px 5px 5px 0px; 
+  border-width: 7px 11px 5px 5px; 
+  border-image: url(/img/speech_bubble_right.png) 7 11 5 5 stretch stretch ;
+  -o-border-image: url(/img/speech_bubble_right.png) 7 11 5 5 stretch stretch ;
+  -moz-border-image: url(/img/speech_bubble_right.png) 7 11 5 5 stretch stretch ;
+  -webkit-border-image: url(/img/speech_bubble_right.png) 7 11 5 5 stretch stretch ;
+}
+
+</style>  
+  <body>
+
+<div data-role="page" id="chatPage">
+
+        <div data-role="header" data-position="fixed">
+            <h3>BeeTalk</h3>
+        </div><!-- /header -->
+
+    <div data-role="content">    
+
+        <!--Our conversation-->
+        <div class="commentArea" id="chatDiv">
+        </div>
+        
+        <!--End of conversation-->
+      <div data-role="footer" data-position="fixed">
+        <center>
+        <div style="max-width:430px;">   
+
+               <input type="text" id="chatInput" style="width:550px"/>
+               <a id="chatBtn" href="#" class="ui-btn-right ui-btn ui-icon-back" data-role="button">Enter</a>
+        </div>
+        </center>
+      </div>
+ </div>
+<script type="text/javascript">
+
+    //For Test
+    var userKey = Math.random();
+    
+    var uniqueKey = "231412312311";
+    
+    var chatBee = new Bee("chatBee",parseInt(uniqueKey),true);
+    
+    
+    //override - heyBee EVENT
+    function onHeyBee(BEECODE,hey)
+    {
+        if(BEECODE==chatBee.BEECODE)
+        {
+               if(hey.userKey==userKey)
+               {
+                $('#chatDiv').html($('#chatDiv').html() + '<div class="bubbledRight"> Me :'+hey.message +'</div>' );
+                  var n = $(document).height();
+                  $('html, body').animate({ scrollTop: n }, 50);
+
+                    if($.browser.mobile)
+                        $('#chatInput').blur();
+
+                    $('#chatInput').val('');           
+               }
+               else
+               {
+               $('#chatDiv').html($('#chatDiv').html() + '<div class="bubbledLeft"> someone:'+ hey.message +'</div>');
+                  var n = $(document).height();
+                  $('html, body').animate({ scrollTop: n }, 50);  
+               }
+        }
+    }
+    
+
+      $(function() {
+          
+             $('#chatBtn').click(function () {
+
+               var message = $('#chatInput').val();
+               
+               var hey = {};
+               hey.userKey = userKey;
+               hey.message = message;
+               heyBee(chatBee.BEECODE,hey);        
+
+             });
+
+
+            $('#chatInput').keydown(function (e){
+                if(e.keyCode == 13){
+                     $('#chatBtn').click();
+                }
+            });
+
+      });
+</script>
+
+    
+
+  </body>
+</html>

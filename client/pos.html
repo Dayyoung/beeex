@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+      <title>TATE - pos</title>
+        
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-0.1.2.js"></script>
+      
+      <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+      <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+  </head>
+  
+ <style type="text/css">
+ 
+        div[data-role ="page"] {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        } 
+         .ui-content{
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }   
+        
+        body.ui-mobile-viewport {	
+        	background: #333;
+            background-position: 0 0;  
+        }
+
+    /* Smartphones (portrait and landscape) ----------- */
+    	div[data-role=page]{
+    		background: white;
+    		max-width: 550px !important;
+    		margin: 0 auto !important;
+    		position: relative !important;
+    	}
+        div[data-role=navbar]{
+            background: white;
+            max-width: 550px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+        }        
+        
+        </style>      
+  
+  <body>
+
+<div data-role="page" id="pageTwo">
+    
+    <div data-role="header" class="jqm-header">
+            <h1>주문내역(History)</h1> 
+    </div> 
+    <!-- /header -->
+    
+    <div data-role="content">
+            
+            <ul data-role="listview" id="orderedList" data-inset="true" class="tablist-left"> 
+
+            </ul>
+
+            <ul data-role="listview" id="dummyList" data-inset="true" class="tablist-left" style="display:none"> 
+
+             <li class="orderedItem" id="orderedItem" data-icon="delete" data-theme = "a" data-inline="true">
+             <a  id="orderedTitle"></a>
+             </li>                 
+
+            </ul>            
+            
+    </div>
+    <!-- /content -->
+    
+</div>           
+
+<audio id="audiotag" src="horn.wav" preload="auto"></audio>
+<div id="windowPlayer">
+<embed id="audiotagII" src='horn.wav' autostart='false' loop='false' width='2' height='0'></embed>    
+</div>           
+
+<script type="text/javascript">
+
+    var menu = [];
+    var menuItem;
+    menuItem = {title : "브런치", title_en : "Brunch" , price : "13000"};
+    menu.push(menuItem);
+    menuItem = {title : "허니브레드", title_en : "HoneyBread" , price : "6000"};
+    menu.push(menuItem);
+    menuItem = {title : "와플", title_en : "Waffle" , price : "6000"};
+    menu.push(menuItem);     
+     
+    var uniqueKey = "20150101231";
+    
+    var testBee = new Bee("TestBee",parseInt(uniqueKey));
+      
+    for(var i in menu)
+    {
+        var INDEX = parseInt(i);
+        addBeeButtonByClosure(INDEX);
+    }
+
+    testBee.addData(menu);
+
+    function addBeeButtonByClosure(INDEX){
+        testBee.addButton((INDEX+1),"P"+(INDEX+1),function(){
+            playHorn();
+            
+            //var POSITION = parseInt(position);
+            var item = $('#orderedItem');                    
+            item.show();     
+            var adapter = $('#orderedList');    
+            var newItem = item.clone();
+            newItem.find("#orderedTitle").html(menu[INDEX].title+" 를 주문하셨습니다.("+menu[INDEX].title_en+" is order.)");
+            
+            newItem.click(function(){
+                newItem.remove();
+            });
+            
+            adapter.append(newItem);           
+        });
+    }      
+      testBee.addButton(5,"C",callWaiter);
+      
+      function callWaiter(){
+          
+            playHorn();
+          
+            //var POSITION = parseInt(position);
+            var item = $('#orderedItem');                    
+            item.show();     
+            var adapter = $('#orderedList');    
+            var newItem = item.clone();
+            newItem.find("#orderedTitle").html("손님이 호출하였습니다.");
+            
+            newItem.click(function(){
+                newItem.remove();
+            });
+            
+            adapter.append(newItem);           
+      }      
+
+//override
+function serverOn(ServerUrl)
+{
+    toast(ServerUrl);
+}
+    
+//override
+function onRecivedBeecode(BEECODE)
+{
+     toast(BEECODE);
+}
+
+/* 
+onready
+*/
+$(function() {
+    var browserVer = getInternetExplorerVersion();
+    if (browserVer > -1 && browserVer < 9) {}
+    else
+        $("#windowPlayer").empty();
+});
+
+
+//Returns the version of Windows Internet Explorer or a -1. Available on the Internet!
+function getInternetExplorerVersion()
+{
+    var rv = -1; // Return value assumes failure.
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+        var ua = navigator.userAgent;
+        var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+        if (re.exec(ua) != null)
+            rv = parseFloat(RegExp.$1);
+    }
+    return rv;
+}
+
+function playHorn(){
+    var browserVer = getInternetExplorerVersion();
+    if (browserVer > -1 && browserVer < 9) {
+        document.getElementById('audiotagII').play();   
+    } else {
+        document.getElementById('audiotag').play();
+    }
+}
+
+function toast(message) {
+    
+    $(this).remove();
+    
+    var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>' + message + '</h3></div>');
+
+    $toast.css({
+        display: 'block', 
+        background: '#fff',
+        opacity: 0.90, 
+        position: 'fixed',
+        padding: '7px',
+        'text-align': 'center',
+        width: '270px',
+        left: ($(window).width() - 284) / 2,
+        top: $(window).height() / 2 - 20
+    });
+
+    var removeToast = function(){
+        $(this).remove();
+    };
+
+    $toast.click(removeToast);
+
+    $toast.appendTo($.mobile.pageContainer).delay(50);
+    
+    //$toast.appendTo($('body')).delay(2000);
+    $toast.fadeOut(2000, removeToast);
+}
+
+</script>    
+    
+
+  </body>
+</html>

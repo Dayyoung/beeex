@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+    
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+      <title>TATE - menu</title>
+        
+      <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+      
+      <link rel="stylesheet" href="/css/owl.carousel.css">
+      <link rel="stylesheet" href="/css/owl.theme.default.css">
+      <script src="/js/owl.carousel.js"></script>
+      
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-0.1.3.js?bee=true"></script>
+      
+  </head>
+ <style type="text/css">
+ 
+        div[data-role ="page"] {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        } 
+         .ui-content{
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }   
+        
+        body.ui-mobile-viewport {	
+        	background: #333;
+            background-position: 0 0;  
+        }
+
+    /* Smartphones (portrait and landscape) ----------- */
+    	div[data-role=page]{
+    		background: white;
+    		max-width: 550px !important;
+    		margin: 0 auto !important;
+    		position: relative !important;
+    	}
+        div[data-role=navbar]{
+            background: white;
+            max-width: 550px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+        }        
+        
+        </style>      
+  
+  
+  <body>
+      
+<script type="text/javascript">
+
+var menu;
+var uniqueKey = "20150101231";
+var currentMenuIndex = 0;
+var MyBEE;
+
+//override
+function serverOn(ServerUrl)
+{
+    toast(ServerUrl);
+}
+    
+//override
+function onRecivedBeecode(BEECODE)
+{
+    this.BEECODE = BEECODE;
+    toast(BEECODE);
+     
+}
+
+//override
+function onFindBee(BEE)
+{
+    if(BEE.key==uniqueKey)
+    {
+        toast(JSON.stringify(BEE.data));
+        MyBEE = BEE;
+        menu = BEE.data;
+        
+        for(var i in menu)
+        {
+            var INDEX = parseInt(i);
+            addClickByClosure(INDEX);
+        }
+    
+        $("#okBtn").click(function() {
+            closeYNDialog();
+            onLoadingDialog();
+            clickBee(BEE.BEECODE,currentMenuIndex);
+        });
+        
+        $(".callBtn").click(function(){
+            onLoadingDialog();
+            clickBee(BEE.BEECODE,5);
+        });    
+    }
+}
+
+function addClickByClosure(INDEX){
+    $(".orderBtn"+parseInt(INDEX+1)).click(function() {
+    currentMenuIndex = parseInt(INDEX+1);
+    openYNDialog(INDEX);
+    });
+}   
+        
+//override - on click button
+function onClickBee(BEECODE,position)
+{
+    if(BEECODE==MyBEE.BEECODE)
+        onCompleteDialog();
+}
+
+/*
+onReady
+*/
+$(function() {
+    
+  //For FF
+  if ( -1 != navigator.userAgent.indexOf('Firefox') )
+    location.href=location.href+"#&ui-state=dialog";
+
+      $('.owl-carousel').owlCarousel({
+          loop:true,
+          center: true,
+          items:1,
+          margin:10,
+          nav:false,
+          autoplay:true,
+          autoplayTimeout:3000,
+          autoplayHoverPause:true
+      });    
+});
+
+function openYNDialog(INDEX)
+{
+    $("#YNtitle").html(menu[INDEX].title+" 를 주문하시겠습니까? 가격은 "+menu[INDEX].price+"원 입니다.");
+    $("#YNtitle").append("(Are you order "+menu[INDEX].title_en+"? Price is "+menu[INDEX].price+" WON.)");
+    $("#popupDialog").popup("open");
+}
+
+function closeYNDialog()
+{
+    $("#popupDialog").popup("close");
+}
+function onLoadingDialog()
+{
+    $.mobile.loading( "show", {
+            text: '잠시만 기다려 주세요 (Waiting for moment.)',
+            textVisible: true,
+            theme: 'a',
+            textonly: false
+    });
+}
+
+
+function onCompleteDialog()
+{
+  $.mobile.loading( "hide" );
+}
+
+function toast(message) {
+    
+    $(this).remove();
+    
+    var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>' + message + '</h3></div>');
+
+    $toast.css({
+        display: 'block', 
+        background: '#fff',
+        opacity: 0.90, 
+        position: 'fixed',
+        padding: '7px',
+        'text-align': 'center',
+        width: '270px',
+        left: ($(window).width() - 284) / 2,
+        top: $(window).height() / 2 - 20
+    });
+
+    var removeToast = function(){
+        $(this).remove();
+    };
+
+    $toast.click(removeToast);
+
+    $toast.appendTo($.mobile.pageContainer).delay(50);
+    
+    //$toast.appendTo($('body')).delay(2000);
+    $toast.fadeOut(2000, removeToast);
+}
+
+
+</script>    
+      
+      
+<div data-role="page" id="pageOne">
+    <div data-role="header" class="jqm-header">
+        <h1>메뉴(Menu)</h1>
+    </div> 
+    <!-- /header -->
+    <div data-role="content">
+        
+         <div class="owl-carousel">
+             
+                <div class="item">
+                    <img src="/img/menu1.jpg"/>
+                    <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a id="" class="orderBtn1 ui-btn ui-icon-delete ui-btn-icon-top" >주문(ORDER)</a></div>
+                    <div class="ui-block-b">
+                        <a id="" class="callBtn ui-btn ui-icon-delete ui-btn-icon-top" >호출(CALL)</a></div>
+                    </div>     
+                    
+                </div>
+                
+                <div class="item">
+                    <img src="/img/menu2.jpg"/>
+                    
+                    <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a id="" class="orderBtn2 ui-btn ui-icon-delete ui-btn-icon-top" >주문(ORDER)</a></div>
+                    <div class="ui-block-b">
+                        <a id="" class="callBtn ui-btn ui-icon-delete ui-btn-icon-top" >호출(CALL)</a></div>
+                    </div>  
+                </div>
+                
+                <div class="item">
+                    <img src="/img/menu3.jpg"/>
+                    <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a id="" class="orderBtn3 ui-btn ui-icon-delete ui-btn-icon-top" >주문(ORDER)</a></div>
+                    <div class="ui-block-b">
+                        <a id="" class="callBtn ui-btn ui-icon-delete ui-btn-icon-top" >호출(CALL)</a></div>
+                    </div>                    
+                </div>
+        </div>  
+    
+    </div>    
+    
+    <div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px; padding:20px">
+        <div role="main" class="ui-content">
+            <h3 class="ui-title" id="YNtitle">실행 하시겠습니까? ( Are you sure? )</h3>
+            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" id="okBtn">확인(OK)</a>
+            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">취소(CANCLE)</a>
+        </div>
+    </div>
+
+</div>    
+    
+
+      
+  </body>
+
+</html>

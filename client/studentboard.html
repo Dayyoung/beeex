@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <!--Origin source - http://www.codeproject.com/Articles/355230/HTML-Canvas-A-Simple-Paint-Program-Touch-and-Mou-->
+   <meta charset="utf-8" />
+   <title>Desktops and Tablets</title>
+ 
+   <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+   <script type="text/javascript" src="/js/excanvas.js"></script>
+
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-0.1.3.js?bee=true"></script>
+      
+   <script type="text/javascript">
+ 
+    var uniqueKey = "201501131004";
+    
+    var drawBee;
+    var context;
+    
+    //override
+    function onFindBee(BEE)
+    {
+        if(BEE.key==uniqueKey)
+        {
+            toast("Got Bee!");
+            drawBee = BEE;
+        }
+    }
+    
+    //override - on click button
+    function onHeyBee(BEECODE,hey)
+    {
+        if(BEECODE==drawBee.BEECODE)
+        {
+            //toast(JSON.stringify(hey));
+        
+            if(hey.action=="START")
+            {
+               context.beginPath();
+               context.moveTo(hey.position.X, hey.position.Y);
+            }
+            else if(hey.action=="MOVING")
+            {
+                context.lineTo(hey.position.X, hey.position.Y);
+                context.stroke();
+            }
+            else if(hey.action=="END")
+            {
+                context.closePath();
+            }
+            else if(hey.action=="CLEAR")
+            {
+                context.clearRect(0, 0, 500, 500); 
+            }
+        }
+    }
+    
+      $(document).ready(function () {
+         initialize();
+      });
+ 
+      function initialize() {
+         // get references to the canvas element as well as the 2D drawing context
+         //var sigCanvas = document.getElementById("canvasSignature");
+         var sigCanvas = $("#canvasSignature")[0];
+         context = sigCanvas.getContext("2d");
+      }
+      
+      
+function toast(message) {
+    
+    $(this).remove();
+    
+    var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>' + message + '</h3></div>');
+
+    $toast.css({
+        display: 'block', 
+        background: '#fff',
+        opacity: 0.90, 
+        position: 'fixed',
+        padding: '7px',
+        'text-align': 'center',
+        width: '270px',
+        left: ($(window).width() - 284) / 2,
+        top: $(window).height() / 2 - 20
+    });
+
+    var removeToast = function(){
+        $(this).remove();
+    };
+
+    $toast.click(removeToast);
+
+    //$toast.appendTo($.mobile.pageContainer).delay(50);
+    
+    //$toast.appendTo($('body')).delay(2000);
+    $toast.fadeOut(2000, removeToast);
+}
+      
+      
+   </script>
+   
+</head>
+ 
+<body>
+   <h1>Student Board</h1>
+ 
+   <div id="canvasDiv">
+      <!-- It's bad practice (to me) to put your CSS here.  I'd recommend the use of a CSS file! -->
+      <canvas id="canvasSignature" width="500" height="500" style="border:2px solid #000000;"></canvas>
+   </div>
+</body>
+</html> 

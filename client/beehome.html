@@ -1,0 +1,296 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+      <title>iotBee</title>
+        
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-latest.js?bee=true"></script>
+      
+      <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+      <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+  </head>
+  
+ <style type="text/css">
+ 
+        div[data-role ="page"] {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        } 
+         .ui-content{
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }   
+        
+        body.ui-mobile-viewport {	
+        	background: #333;
+            background-position: 0 0;  
+        }
+
+    /* Smartphones (portrait and landscape) ----------- */
+    	div[data-role=page]{
+    		background: white;
+    		max-width: 550px !important;
+    		margin: 0 auto !important;
+    		position: relative !important;
+    	}
+        div[data-role=navbar]{
+            background: white;
+            max-width: 550px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+        }        
+        
+        
+        </style>      
+  
+  <body>
+
+<div data-role="page" id="pageTwo">
+    
+    <div data-role="header" class="jqm-header">
+            <h1>BeeHome</h1> 
+    </div> 
+    <!-- /header -->
+    
+    <div data-role="content">
+            <br><br>
+            
+            <div style="margin:20px;">
+            <div class="ui-grid-b">
+                <div id="item" class="ui-block-a">
+                  <form><span for="selectLanguage"><font size="2px"> Light1 :</font></span>
+                      <select name="flip-3" id="Light1" data-theme="c" data-role="flipswitch" data-mini="true">
+                          <option value="off" selected>Off</option>
+                          <option value="on">On</option>
+                      </select>
+                  </form>
+                </div>
+                <div id="item" class="ui-block-b">
+
+                  <form><span for="selectLanguage"><font size="2px"> Light2 :</font></span>
+                      <select name="flip-3" id="Light2" data-theme="c" data-role="flipswitch" data-mini="true">
+                          <option value="off" selected>Off</option>
+                          <option value="on">On</option>
+                      </select>
+                  </form>
+                </div>
+                <div id="item" class="ui-block-c">
+                  <form><span for="selectLanguage"><font size="2px"> Light3 :</font></span>
+                      <select name="flip-3" id="Light3" data-theme="c" data-role="flipswitch" data-mini="true">
+                          <option value="off" selected>Off</option>
+                          <option value="on">On</option>
+                      </select>
+                  </form>
+                </div>
+            </div>
+
+            <div class="ui-grid-b">
+                <div id="item" class="ui-block-a">
+                  <form><span for="selectLanguage"><font size="2px"> Light4 :</font></span>
+                      <select name="flip-3" id="Light4" data-theme="c" data-role="flipswitch" data-mini="true">
+                          <option value="off" selected>Off</option>
+                          <option value="on">On</option>
+                      </select>
+                  </form>
+                </div>
+                <div id="item" class="ui-block-b">
+
+                  <form><span for="selectLanguage"><font size="2px"> Light5 :</font></span>
+                      <select name="flip-3" id="Light5" data-theme="c" data-role="flipswitch" data-mini="true">
+                          <option value="off" selected>Off</option>
+                          <option value="on">On</option>
+                      </select>
+                  </form>
+                </div>
+                <div id="item" class="ui-block-c">
+                  <form><span for="selectLanguage"><font size="2px"> Light6 :</font></span>
+                      <select name="flip-3" id="Light6" data-theme="c" data-role="flipswitch" data-mini="true">
+                          <option value="off" selected>Off</option>
+                          <option value="on">On</option>
+                      </select>
+                  </form>
+                </div>
+            </div>
+            
+            <br><br>      
+
+            <form>
+                <label for="slider-1" id="temperatureNowLabel">Temperature Now : </label>
+                <input type="range" class="gazer" name="slider-1" data-highlight="true" id="temperatureNow" min="0" max="100" value="50" >
+            
+                <label for="slider-2">Temperature Set : </label>
+                <input type="range" name="slider-2" id="temperatureSet" min="0" max="100" value="22" data-popup-enabled="true">
+            
+                <label for="slider-3" id="HumidityNowLabel">Humidity Now : </label>
+                <input type="range" class="gazer" name="slider-3"  data-highlight="true" id="humidityNow" min="0" max="100" value="50" >
+                <label for="slider-4">Humidity Set : </label>
+                <input type="range" name="slider-4" id="humiditySet" min="0" max="100" value="50" data-popup-enabled="true">
+                
+            </form>                    
+            
+        </div>
+ 
+            
+    </div>
+    <!-- /content -->
+      
+</div>           
+
+<script type="text/javascript">
+
+var uniqueKey = "107";
+    
+var iotBee;   
+var lightState;
+
+/* 
+onready
+*/
+$(function() {
+});
+
+
+//override
+function onFindBee(BEE)
+{
+    if(BEE.key==uniqueKey)
+    {
+        toast(JSON.stringify(BEE.data));
+        iotBee = BEE;
+        lightState = BEE.data.lightState;
+        
+          $(lightState).each(function(i){
+              var INDEX = parseInt(i)+1;
+              $("#Light"+INDEX).parent().click(function(){  
+                 clickBee(iotBee.BEECODE,INDEX); 
+              });
+          });  
+          
+
+          $(lightState).each(function(i){
+              
+              var INDEX = parseInt(i)+1;
+              
+              if(lightState[i])
+                  $("#Light"+INDEX).val("on").flipswitch('refresh');
+              else
+                  $("#Light"+INDEX).val("off").flipswitch('refresh');
+          });
+                  
+          
+          $("#temperatureSet").change(function() {
+              var hey = {};
+              hey.temperatureSet = $(this).val();
+              heyBee(iotBee.BEECODE,hey);
+          });
+
+          $("#humiditySet").change(function() {
+              var hey = {};
+              hey.humiditySet = $(this).val();
+              heyBee(iotBee.BEECODE,hey);
+          });          
+          
+    }
+}
+    
+//override - on click button
+function onHeyBee(BEECODE,hey)
+{
+    if(BEECODE==iotBee.BEECODE)
+    {
+        
+        if(hey.serverState=="ON")
+        {
+          var lightState = hey.lightState;
+          
+          $(lightState).each(function(i){
+              var INDEX = parseInt(i)+1;
+              if(lightState[i])
+                  $("#Light"+INDEX).val("on").flipswitch('refresh');
+              else
+                  $("#Light"+INDEX).val("off").flipswitch('refresh');
+          });
+        }   
+        
+        //toast(JSON.stringify(hey));
+        if(hey.serverState=="OFF")
+        {
+          $(".Light").val("off").flipswitch('refresh');
+          
+          
+          $("#temperatureNowLabel").html("Temperature Now :");
+          $("#temperatureNow").val(0).slider('refresh');
+          $("#temperatureSet").val(0).slider('refresh');
+          $("#humidityNowLabel").html("humidity Now :");
+          $("#humidityNow").val(0).slider('refresh');
+          $("#humiditySet").val(0).slider('refresh');
+        }
+        
+        if(hey.TemperatureNow)
+        {
+            $("#temperatureNowLabel").html("Temperature Now : " + hey.TemperatureNow + "C")
+            $("#temperatureNow").val(hey.TemperatureNow).slider('refresh');
+        }   
+        if(hey.HumidityNow)
+        {
+            $("#humidityNowLabel").html("humidity Now : " + hey.HumidityNow + "%")
+            $("#humidityNow").val(hey.HumidityNow).slider('refresh');
+        }
+    }
+}
+
+
+//override
+function serverOn(ServerUrl)
+{
+    toast(ServerUrl);
+}
+    
+//override
+function onRecivedBeecode(BEECODE)
+{
+     toast(BEECODE);
+}
+
+
+function toast(message) {
+    
+    $(this).remove();
+    
+    var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>' + message + '</h3></div>');
+
+    $toast.css({
+        display: 'block', 
+        background: '#fff',
+        opacity: 0.90, 
+        position: 'fixed',
+        padding: '7px',
+        'text-align': 'center',
+        width: '270px',
+        left: ($(window).width() - 284) / 2,
+        top: $(window).height() / 2 - 20
+    });
+
+    var removeToast = function(){
+        $(this).remove();
+    };
+
+    $toast.click(removeToast);
+
+    $toast.appendTo($.mobile.pageContainer).delay(50);
+    
+    //$toast.appendTo($('body')).delay(2000);
+    $toast.fadeOut(2000, removeToast);
+}
+
+</script>    
+    
+
+  </body>
+</html>

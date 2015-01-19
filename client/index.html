@@ -1,0 +1,46 @@
+<!doctype html>
+<htmlp>
+  <head>
+    <title>beeconJS.com</title>
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-latest.js"></script>
+  </head>
+  
+<script type="text/javascript">
+
+function serverOn(url)
+{
+  alert(url);
+}
+
+function onRecivedBeecode(BEECODE)
+{
+  alert(BEECODE);
+}
+
+var helloBee = new Bee('HelloBee',20000);
+//inflate Bee.
+
+helloBee.addButton(1,"H",function(){  
+  alert("H");
+});
+helloBee.addButton(2,"E",function(){ 
+  alert("E");
+});
+helloBee.addButton(3,"L",function(){ 
+  alert("L");
+});
+helloBee.addButton(4,"L",function(){ 
+  alert("L");
+});
+helloBee.addButton(5,"O",function(){ 
+  alert("O");
+});
+
+</script>
+  
+  <body>
+  Hello world!
+  </body>
+</html>

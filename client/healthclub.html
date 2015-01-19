@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+      <title>healthClub</title>
+        
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://beeconjs.com/socket.io/socket.io.js"></script>
+      <script src="http://beeconjs.com/js/beecon-latest.js"></script>
+      
+      <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+      <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+  </head>
+  
+ <style type="text/css">
+ 
+        div[data-role ="page"] {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        } 
+         .ui-content{
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }   
+        
+        body.ui-mobile-viewport {	
+        	background: #333;
+            background-position: 0 0;  
+        }
+
+    /* Smartphones (portrait and landscape) ----------- */
+    	div[data-role=page]{
+    		background: white;
+    		max-width: 550px !important;
+    		margin: 0 auto !important;
+    		position: relative !important;
+    	}
+        div[data-role=navbar]{
+            background: white;
+            max-width: 550px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+        }        
+        
+        </style>      
+  
+  <body>
+
+<div data-role="page" id="pageTwo">
+    
+    <div data-role="header" class="jqm-header">
+            <h1>HealthClub</h1> 
+    </div> 
+    <!-- /header -->
+    
+    <div data-role="content">
+            
+            <ul data-role="listview" id="orderedList" data-inset="true" class="tablist-left"> 
+
+            </ul>
+
+            <ul data-role="listview" id="dummyList" data-inset="true" class="tablist-left" style="display:none"> 
+
+             <li class="orderedItem" id="orderedItem" data-icon="delete" data-theme = "a" data-inline="true">
+             <a  id="orderedTitle"></a>
+             </li>                 
+
+            </ul>            
+            
+    </div>
+    <!-- /content -->
+    
+
+        <!--End of conversation-->
+      <div data-role="footer" data-position="fixed">
+        <center>
+        <div>   
+               <a id="syncBtn" class="ui-btn">Syncronize</a>
+        </div>
+        </center>
+      </div>    
+      
+</div>           
+
+<script type="text/javascript">
+
+var uniqueKey = "2015011111";
+    
+var HealthBee = new Bee("HealthBee",parseInt(uniqueKey));
+      
+HealthBee.addButton(5,"C",RequestSync);
+      
+function RequestSync(){
+    //For event.
+}      
+    
+
+/* 
+onready
+*/
+$(function() {
+    $("#syncBtn").click(function() {
+        clickBee(HealthBee.BEECODE,5);
+    });
+});
+    
+    
+//override - on click button
+function onHeyBee(BEECODE,hey)
+{
+    if(BEECODE==HealthBee.BEECODE)
+    {
+    //var POSITION = parseInt(position);
+        var item = $('#orderedItem');                    
+        item.show();     
+        var adapter = $('#orderedList');    
+        var newItem = item.clone();
+        newItem.find("#orderedTitle").html(hey.lowData + " Kcal is saved.");
+        
+        newItem.click(function(){
+            newItem.remove();
+        });
+        
+        adapter.append(newItem);  
+    }
+}
+
+//override
+function serverOn(ServerUrl)
+{
+    toast(ServerUrl);
+}
+    
+//override
+function onRecivedBeecode(BEECODE)
+{
+     toast(BEECODE);
+}
+
+
+function toast(message) {
+    
+    $(this).remove();
+    
+    var $toast = $('<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><h3>' + message + '</h3></div>');
+
+    $toast.css({
+        display: 'block', 
+        background: '#fff',
+        opacity: 0.90, 
+        position: 'fixed',
+        padding: '7px',
+        'text-align': 'center',
+        width: '270px',
+        left: ($(window).width() - 284) / 2,
+        top: $(window).height() / 2 - 20
+    });
+
+    var removeToast = function(){
+        $(this).remove();
+    };
+
+    $toast.click(removeToast);
+
+    $toast.appendTo($.mobile.pageContainer).delay(50);
+    
+    //$toast.appendTo($('body')).delay(2000);
+    $toast.fadeOut(2000, removeToast);
+}
+
+</script>    
+    
+
+  </body>
+</html>
